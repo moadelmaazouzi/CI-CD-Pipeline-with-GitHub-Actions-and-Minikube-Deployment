@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mon-projet-angular-deployment
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: mon-projet-angular
+  template:
+    metadata:
+      labels:
+        app: mon-projet-angular
+    spec:
+      containers:
+      - name: mon-projet-angular
+        image: VOTRE_NOM_UTILISATEUR_DOCKER/mon-projet-angular:latest
+        ports:
+        - containerPort: 80
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: mon-projet-angular-service
+spec:
+  selector:
+    app: mon-projet-angular
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+      nodePort: 30007 # Port pour accéder à l'app depuis l'extérieur de Minikube
+  type: NodePort 

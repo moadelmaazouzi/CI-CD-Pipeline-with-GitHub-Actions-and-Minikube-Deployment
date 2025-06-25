@@ -1,0 +1,42 @@
+name: Déploiement Angular sur Minikube
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout du code
+      uses: actions/checkout@v3
+
+    - name: Connexion à Docker Hub
+      uses: docker/login-action@v2
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+    - name: Build et push de l'image Docker
+      uses: docker/build-push-action@v4
+      with:
+        context: .
+        push: true
+        tags: ${{ secrets.DOCKERHUB_USERNAME }}/mon-projet-angular:latest
+
+    - name: Déploiement sur la VM via SSH
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.VM_HOST }}
+        username: ${{ secrets.VM_USERNAME }}
+        key: ${{ secrets.VM_SSH_PRIVATE_KEY }}
+        script: |
+          echo "Connexion à la VM réussie. Déploiement en cours..."
+          # Remplacer le placeholder dans le fichier de déploiement
+          sed -i 's|image:.*|image: ${{ secrets.DOCKERHUB_USERNAME }}/mon-projet-angular:latest|g' k8s/deployment.yaml
+          
+          # Appliquer la configuration Kubernetes
+          minikube kubectl -- apply -f k8s/deployment.yaml
+          
+          echo "Déploiement terminé." 
