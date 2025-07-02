@@ -32,11 +32,10 @@ jobs:
         username: ${{ secrets.VM_USERNAME }}
         key: ${{ secrets.VM_SSH_PRIVATE_KEY }}
         script: |
-          echo "Connexion à la VM réussie. Déploiement en cours..."
-          # Remplacer le placeholder dans le fichier de déploiement
-          sed -i 's|image:.*|image: ${{ secrets.DOCKERHUB_USERNAME }}/mon-projet-angular:latest|g' k8s/deployment.yaml
-          
-          # Appliquer la configuration Kubernetes
-          minikube kubectl -- apply -f k8s/deployment.yaml
-          
-          echo "Déploiement terminé." 
+          echo "Connexion à la VM réussie. Déploiement Docker en cours..."
+          docker stop mon-projet-angular || true
+          docker rm mon-projet-angular || true
+          docker rmi ${{ secrets.DOCKERHUB_USERNAME }}/mon-projet-angular:latest || true
+          docker pull ${{ secrets.DOCKERHUB_USERNAME }}/mon-projet-angular:latest
+          docker run -d --name mon-projet-angular -p 80:80 ${{ secrets.DOCKERHUB_USERNAME }}/mon-projet-angular:latest
+          echo "Déploiement Docker terminé." 
