@@ -1,0 +1,16 @@
+<div class="todo-container">
+    <h2>Ma ToDo List</h2>
+    <input [(ngModel)]="newTodo" placeholder="Nouvelle tâche" (keyup.enter)="addTodo()" />
+    <button (click)="addTodo()">Ajouter</button>
+  
+    <ul>
+      <li *ngFor="let todo of todos">
+        <span *ngIf="editId !== todo.id">{{ todo.title }}</span>
+        <input *ngIf="editId === todo.id" [(ngModel)]="editTitle" (keyup.enter)="updateTodo()" />
+        <button *ngIf="editId !== todo.id" (click)="startEdit(todo)">Modifier</button>
+        <button *ngIf="editId === todo.id" (click)="updateTodo()">Valider</button>
+        <button *ngIf="editId === todo.id" (click)="cancelEdit()">Annuler</button>
+        <button (click)="deleteTodo(todo.id)">Supprimer</button>
+      </li>
+    </ul>
+  </div>
